@@ -51,7 +51,7 @@ public class Main extends ApplicationAdapter {
 			camera.zoom -= .1f;
 		}
 
-		ScreenUtils.clear(0, 0, 0, 1);
+		ScreenUtils.clear(0.25f, 0.25f, 0.25f, 1);
 		viewport.apply();
 		batch.begin();
 		batch.setProjectionMatrix(camera.combined);
