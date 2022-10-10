@@ -17,17 +17,17 @@ public class QuadTree {
     private List<QuadTreePoint> points;
     private List<QuadTreePoint> queriedPoints;
     private boolean divided;
-
-
+    private Integer subdivideCount;
 
     private QuadTree northWest;
     private QuadTree northEast;
     private QuadTree southWest;
     private QuadTree southEast;
 
-    public QuadTree(QuadTreeRectangle boundary, int capacity) {
+    public QuadTree(QuadTreeRectangle boundary, int capacity, Integer subdivideCount) {
         this.boundary = boundary;
         this.capacity = capacity;
+        this.subdivideCount = subdivideCount;
         this.points = new ArrayList<>();
         this.queriedPoints = new ArrayList<>();
 
@@ -41,9 +41,9 @@ public class QuadTree {
         if (this.points.size() < this.capacity) {
             this.points.add(point);
             return true;
-        } else {
+        } else if (subdivideCount > 0){
             if (!this.divided) {
-                this.subdivide();
+                this.subdivide(subdivideCount - 1);
             }
             if (this.northWest.insert(point))
                 return true;
@@ -57,17 +57,18 @@ public class QuadTree {
         return false;
     }
 
-    private void subdivide() {
+    private void subdivide(Integer subdivideCount) {
         QuadTreeRectangle nE = new QuadTreeRectangle(this.boundary.getRightIn(), this.boundary.getTopIn(), this.boundary.getWidth() * 0.5f, this.boundary.getHeight() * 0.5f);
         QuadTreeRectangle nW = new QuadTreeRectangle(this.boundary.getLeftIn(), this.boundary.getTopIn(), this.boundary.getWidth() * 0.5f, this.boundary.getHeight() * 0.5f);
         QuadTreeRectangle sE = new QuadTreeRectangle(this.boundary.getRightIn(), this.boundary.getBottomIn(), this.boundary.getWidth() * 0.5f, this.boundary.getHeight() * 0.5f);
         QuadTreeRectangle sW = new QuadTreeRectangle(this.boundary.getLeftIn(), this.boundary.getBottomIn(), this.boundary.getWidth() * 0.5f, this.boundary.getHeight() * 0.5f);
 
-        northWest = new QuadTree(nW, this.capacity);
-        northEast = new QuadTree(nE, this.capacity);
-        southWest = new QuadTree(sW, this.capacity);
-        southEast = new QuadTree(sE, this.capacity);
+        northWest = new QuadTree(nW, this.capacity, subdivideCount);
+        northEast = new QuadTree(nE, this.capacity, subdivideCount);
+        southWest = new QuadTree(sW, this.capacity, subdivideCount);
+        southEast = new QuadTree(sE, this.capacity, subdivideCount);
         this.divided = true;
+
     }
 
     public List<QuadTreePoint> query(QuadTreeRectangle range) {

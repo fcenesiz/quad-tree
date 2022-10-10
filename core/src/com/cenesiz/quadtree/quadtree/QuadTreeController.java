@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
-import com.cenesiz.quadtree.Main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,18 +18,23 @@ public class QuadTreeController {
     private float width;
     private float height;
     private int capacity;
+    private int maxDepth;
+    private List<QuadTreeRectangle> rectanglePool;
 
     public static TextureRegion Color_RED;
     public static TextureRegion Color_YELLOW;
     public static TextureRegion Color_GREEN;
 
-    public QuadTreeController(float x, float y, float width, float height, List<QuadTreePoint> points, int capacity) {
+    public QuadTreeController(float x, float y, float width, float height,
+                              List<QuadTreePoint> points, int capacity, int maxDepth) {
         this.width = width;
         this.height = height;
         this.x = x + width * 0.5f; // origin x center
         this.y = y + height * 0.5f; // origin y center
         this.capacity = capacity;
+        this.maxDepth = Math.min(maxDepth, 8);
         this.queriedPoints = new ArrayList<>();
+        this.rectanglePool = new ArrayList<>();
 
         Color_RED = CreateRegion(Color.RED);
         Color_YELLOW = CreateRegion(Color.YELLOW);
@@ -43,7 +46,7 @@ public class QuadTreeController {
     private void init(List<QuadTreePoint> points) {
 
         QuadTreeRectangle boundary = new QuadTreeRectangle(x, y, width, height);
-        quadTree = new QuadTree(boundary, capacity);
+        quadTree = new QuadTree(boundary, capacity, maxDepth);
         for (int i = 0; i < points.size(); i++) {
             QuadTreePoint point = points.get(i);
             quadTree.insert(point);
@@ -58,6 +61,11 @@ public class QuadTreeController {
         queriedPoints.clear();
         queriedPoints.addAll(quadTree.query(rectangle));
         return queriedPoints;
+    }
+
+    public void query(QuadTreeRectangle rectangle, List<QuadTreePoint> queriedPoints) {
+        queriedPoints.clear();
+        queriedPoints.addAll(quadTree.query(rectangle));
     }
 
     public void render(SpriteBatch batch) {

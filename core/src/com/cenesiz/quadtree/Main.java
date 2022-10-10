@@ -39,7 +39,7 @@ public class Main extends ApplicationAdapter {
 
 
 		List<QuadTreePoint> points = new ArrayList<>();
-		for (int i = 0; i < 500; i++) {
+		for (int i = 0; i < 1500; i++) {
 			QuadTreePoint p = new QuadTreePoint(MathUtils.random() * 500f, MathUtils.random() * 500f);
 			points.add(p);
 		}
@@ -48,7 +48,8 @@ public class Main extends ApplicationAdapter {
 				0, 0,
 				500, 500,
 				points,
-				4
+				4,
+				8
 		);
 
 		QuadTreeRectangle range = new QuadTreeRectangle(225, 175 + 100, 107, 75);
