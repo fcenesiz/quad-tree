@@ -8,23 +8,22 @@
 Example of usage
 
 ```Java
-        QuadTreeRectangle boundary = new QuadTreeRectangle(250, 250, 500, 500);
-        
-        quadTree = new QuadTree(
-                boundary, // bounds
-                4 // capacity of tree
-        );
-        
-        // add some points
-        for (int i = 0; i < 250; i++) {
+        List<QuadTreePoint> points = new ArrayList<>();
+        for (int i = 0; i < 500; i++) {
             QuadTreePoint p = new QuadTreePoint(
-                    boundary.x - 250 + MathUtils.random() * 500,
-                    boundary.y - 250 + MathUtils.random() * 500
+                    MathUtils.random() * 500f, // x
+                    MathUtils.random() * 500f // y
             );
-            quadTree.insert(p);
+            points.add(p);
         }
 
-        // query the points inside the rectangle
-        QuadTreeRectangle range = new QuadTreeRectangle(225, 175 + 100, 107, 75);
-        points = quadTree.query(range);
+        quadTreeController = new QuadTreeController(
+                0, 0, // x, y
+                500, 500, // width, height
+                points,
+                4 // capacity
+        );
+
+        QuadTreeRectangle range = new QuadTreeRectangle(225, 375, 107, 75);
+        quadTreeController.query(range);
 ```
