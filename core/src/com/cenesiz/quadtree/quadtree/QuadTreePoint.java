@@ -33,6 +33,14 @@ public class QuadTreePoint {
         this.y = y;
     }
 
+    public void translateX(float dx) {
+        this.x += dx;
+    }
+
+    public void translateY(float dy) {
+        this.y += dy;
+    }
+
     public Object getObject() {
         return object;
     }

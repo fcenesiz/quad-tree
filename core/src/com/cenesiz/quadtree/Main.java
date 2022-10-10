@@ -9,9 +9,16 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.cenesiz.quadtree.quadtree.QuadTreeController;
+import com.cenesiz.quadtree.quadtree.QuadTreePoint;
+import com.cenesiz.quadtree.quadtree.QuadTreeRectangle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends ApplicationAdapter {
 
@@ -19,11 +26,7 @@ public class Main extends ApplicationAdapter {
 	Viewport viewport;
 	SpriteBatch batch;
 
-	public static TextureRegion Color_RED;
-	public static TextureRegion Color_YELLOW ;
-	public static TextureRegion Color_GREEN;
-
-	QuadTreeTest quadTreeTest;
+	QuadTreeController quadTreeController;
 
 	@Override
 	public void create () {
@@ -34,29 +37,44 @@ public class Main extends ApplicationAdapter {
 		this.viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch = new SpriteBatch();
 
-		Color_RED = CreateRegion(Color.RED);
-		Color_YELLOW = CreateRegion(Color.YELLOW);
-		Color_GREEN = CreateRegion(Color.GREEN);
 
-		quadTreeTest = new QuadTreeTest();
+		List<QuadTreePoint> points = new ArrayList<>();
+		for (int i = 0; i < 500; i++) {
+			QuadTreePoint p = new QuadTreePoint(MathUtils.random() * 500f, MathUtils.random() * 500f);
+			points.add(p);
+		}
+
+		quadTreeController = new QuadTreeController(
+				0, 0,
+				500, 500,
+				points,
+				4
+		);
+
+		QuadTreeRectangle range = new QuadTreeRectangle(225, 175 + 100, 107, 75);
+		quadTreeController.query(range);
 	}
 
-	@Override
-	public void render () {
-
+	public void update(float dt){
 		if (Gdx.input.isKeyPressed(Input.Keys.A)){
 			camera.zoom += .1f;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.Q)){
 			camera.zoom -= .1f;
 		}
+	}
+
+	@Override
+	public void render () {
+		this.update(Gdx.graphics.getDeltaTime());
+
 
 		ScreenUtils.clear(0.25f, 0.25f, 0.25f, 1);
 		viewport.apply();
 		batch.begin();
 		batch.setProjectionMatrix(camera.combined);
 
-		quadTreeTest.render(batch);
+		quadTreeController.render(batch);
 		batch.end();
 	}
 	
@@ -66,32 +84,7 @@ public class Main extends ApplicationAdapter {
 
 	}
 
-	public static void Draw(SpriteBatch batch, TextureRegion region, float x, float y, float oX, float oY, float width, float height, float scale, float rotation) {
-		batch.draw(region, x - oX, y - oY, oX, oY,
-				width, height, scale, scale, rotation);
-	}
 
-	public static void DrawRectangle(SpriteBatch batch, TextureRegion region, float x, float y, float oX, float oY, float width, float height, float stroke){
-		float left = x - oX;
-		float right = left + width;
-		float bottom = y - oY;
-		float top = bottom + height;
-		//left
-		batch.draw(region, left, bottom, stroke, height);
-		//right
-		batch.draw(region, right, bottom, stroke, height);
-		//bottom
-		batch.draw(region, left, bottom, width, stroke);
-		//top
-		batch.draw(region, left, top, width, stroke);
-	}
 
-	public static TextureRegion CreateRegion(Color color){
-		Pixmap pixmap = new Pixmap( 64, 64, Pixmap.Format.RGBA8888 );
-		pixmap.setColor( color );
-		pixmap.fillRectangle( 0, 0, 16, 16);
-		Texture pixmaptex = new Texture( pixmap );
-		pixmap.dispose();
-		return new TextureRegion(pixmaptex, 0, 0, 16, 16);
-	}
+
 }

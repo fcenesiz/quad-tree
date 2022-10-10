@@ -1,6 +1,10 @@
 package com.cenesiz.quadtree.quadtree;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.cenesiz.quadtree.Main;
 
 import java.util.ArrayList;
@@ -11,7 +15,10 @@ public class QuadTree {
     private QuadTreeRectangle boundary;
     private int capacity;
     private List<QuadTreePoint> points;
+    private List<QuadTreePoint> queriedPoints;
     private boolean divided;
+
+
 
     private QuadTree northWest;
     private QuadTree northEast;
@@ -22,6 +29,9 @@ public class QuadTree {
         this.boundary = boundary;
         this.capacity = capacity;
         this.points = new ArrayList<>();
+        this.queriedPoints = new ArrayList<>();
+
+
     }
 
 
@@ -52,6 +62,7 @@ public class QuadTree {
         QuadTreeRectangle nW = new QuadTreeRectangle(this.boundary.getLeftIn(), this.boundary.getTopIn(), this.boundary.getWidth() * 0.5f, this.boundary.getHeight() * 0.5f);
         QuadTreeRectangle sE = new QuadTreeRectangle(this.boundary.getRightIn(), this.boundary.getBottomIn(), this.boundary.getWidth() * 0.5f, this.boundary.getHeight() * 0.5f);
         QuadTreeRectangle sW = new QuadTreeRectangle(this.boundary.getLeftIn(), this.boundary.getBottomIn(), this.boundary.getWidth() * 0.5f, this.boundary.getHeight() * 0.5f);
+
         northWest = new QuadTree(nW, this.capacity);
         northEast = new QuadTree(nE, this.capacity);
         southWest = new QuadTree(sW, this.capacity);
@@ -60,29 +71,29 @@ public class QuadTree {
     }
 
     public List<QuadTreePoint> query(QuadTreeRectangle range) {
-        List<QuadTreePoint> foundedPoints = new ArrayList<>();
+        queriedPoints.clear();
         if (!this.boundary.intersects(range))
-            return foundedPoints;
+            return queriedPoints;
         else {
             for (int i = 0; i < this.points.size(); i++) {
                 if (points.get(i) != null && range.contains(points.get(i))) {
-                    foundedPoints.add(points.get(i));
+                    queriedPoints.add(points.get(i));
                 }
             }
         }
         if (this.divided) {
-            foundedPoints.addAll(this.northWest.query(range));
-            foundedPoints.addAll(this.northEast.query(range));
-            foundedPoints.addAll(this.southWest.query(range));
-            foundedPoints.addAll(this.southEast.query(range));
+            queriedPoints.addAll(this.northWest.query(range));
+            queriedPoints.addAll(this.northEast.query(range));
+            queriedPoints.addAll(this.southWest.query(range));
+            queriedPoints.addAll(this.southEast.query(range));
         }
-        return foundedPoints;
+        return queriedPoints;
     }
 
     public void render(SpriteBatch batch) {
-        Main.DrawRectangle(batch, Main.Color_RED, this.boundary.getX(), this.boundary.getY(), this.boundary.getOriginX(), this.boundary.getOriginY(), this.boundary.getWidth(), this.boundary.getHeight(), 2);
+        QuadTreeController.DrawRectangle(batch, QuadTreeController.Color_RED, this.boundary.getX(), this.boundary.getY(), this.boundary.getOriginX(), this.boundary.getOriginY(), this.boundary.getWidth(), this.boundary.getHeight(), 2);
         for (int i = 0; i < points.size(); i++) {
-            Main.Draw(batch, Main.Color_YELLOW, this.points.get(i).getX(), this.points.get(i).getY(), 1, 1, 2, 2, 1, 0);
+            QuadTreeController.Draw(batch, QuadTreeController.Color_YELLOW, this.points.get(i).getX(), this.points.get(i).getY(), 1, 1, 2, 2, 1, 0);
         }
         if (this.divided) {
             this.northWest.render(batch);
@@ -92,4 +103,7 @@ public class QuadTree {
         }
     }
 
+    public List<QuadTreePoint> getPoints() {
+        return points;
+    }
 }
